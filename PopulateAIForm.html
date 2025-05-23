@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Supplier Contract Request</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <style>
+    :root { --brand-color: #b68835; }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #f9f9f9;
+      margin: 0; padding: 20px; color: #333;
+    }
+
+    h2 {
+      color: var(--brand-color);
+      margin: 0;
+    }
+
+    .form-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 900px;
+      margin: 0 auto 20px auto;
+    }
+.form-submit {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 900px;
+      margin: 0 auto 20px auto;
+    }
+
+
+    .form-header button {
+      background: var(--brand-color);
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+.form-submit button {
+     background: var(--brand-color);
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 18px;
+    width: 100px;
+    }
+
+    .form-container {
+      max-width: 900px;
+      margin: auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      padding-bottom: 30px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 4px;
+      font-weight: bold;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    input, select, textarea {
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    textarea {
+      resize: vertical;
+    }
+
+    .full-width {
+      grid-column: span 2;
+    }
+
+    /* Modal Styles */
+    .chat-modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.4);
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
+    }
+
+    .chat-box {
+      width: 400px;
+      height: 480px;
+      background: white;
+      border-radius: 10px;
+      border: 2px solid var(--brand-color);
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+
+    .chat-header {
+      background: var(--brand-color);
+      color: white;
+      padding: 10px;
+      border-radius: 10px 10px 0 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .chatbox {
+      flex: 1;
+      padding: 10px;
+      overflow-y: auto;
+      font-size: 14px;
+    }
+
+    .chat-input-area {
+      display: flex;
+      align-items: center;
+      padding: 8px;
+      border-top: 1px solid #ddd;
+    }
+
+    .chat-input-area input[type="text"] {
+      flex: 1;
+      padding: 8px;
+      border-radius: 20px;
+      border: 1px solid #ccc;
+    }
+
+    .chat-input-area i {
+      font-size: 18px;
+      color: var(--brand-color);
+      margin-left: 10px;
+      cursor: pointer;
+    }
+
+    .chat-file-upload {
+      padding: 8px 10px;
+      border-top: 1px solid #eee;
+      text-align: center;
+    }
+
+    .chat-file-upload input {
+      width: 96%;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="form-header">
+    <h2>Supplier Contract Request Form</h2>
+    <button onclick="openChatModal()">Pre-populate using AI</button>
+  </div>
+
+  <form id="contractForm" class="form-container">
+    <div class="form-group">
+      <label>Supplier Name</label>
+      <input type="text" id="supplierName" />
+    </div>
+    <div class="form-group">
+      <label>Contract Title</label>
+      <input type="text" id="contractTitle" />
+    </div>
+    <div class="form-group">
+      <label>Contract Type</label>
+      <select id="type">
+        <option value="">Select</option>
+        <option value="NDA">NDA</option>
+        <option value="SOW">Statement of Work</option>
+        <option value="MSA">Master Services Agreement</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Department</label>
+      <input type="text" id="department" />
+    </div>
+    <div class="form-group">
+      <label>Start Date</label>
+      <input type="date" id="startDate" />
+    </div>
+    <div class="form-group">
+      <label>End Date</label>
+      <input type="date" id="endDate" />
+    </div>
+    <div class="form-group">
+      <label>Contract Value (USD)</label>
+      <input type="number" id="value" />
+    </div>
+    <div class="form-group">
+      <label>Payment Terms</label>
+      <input type="text" id="paymentTerms" />
+    </div>
+    <div class="form-group">
+      <label>Requester Email</label>
+      <input type="email" id="email" />
+    </div>
+    <div class="form-group">
+      <label>Risk Assessment Required</label>
+      <select id="risk">
+        <option value="">Select</option>
+        <option value="Yes">Yes</option>
+        <option value="No">No</option>
+      </select>
+    </div>
+    <div class="form-group full-width">
+      <label>Internal Stakeholders</label>
+      <textarea id="stakeholders" rows="2"></textarea>
+    </div>
+    <div class="form-group full-width">
+      <label>Justification</label>
+      <textarea id="justification" rows="3"></textarea>
+    </div>
+   
+  </form>
+<div class="form-submit">
+    <h2></h2>
+       <button type="button" class="btn btn-lg" onclick="alert('Submitted Successfully')">Submit</button>
+  </div>
+
+
+  <!-- Chat Modal -->
+  <div id="chatModal" class="chat-modal">
+    <div class="chat-box">
+      <div class="chat-header">
+        Chat Assistant
+        <i class="fas fa-times" onclick="closeChatModal()"></i>
+      </div>
+      <div class="chatbox" id="chatbox">
+        <p><em>Upload a document or describe the contract to get started.</em></p>
+      </div>
+      <div class="chat-input-area">
+        <input type="text" id="chatInput" placeholder="Type your request..." />
+        <i class="fas fa-microphone" onclick="startVoiceDictation()"></i>
+        <i class="fas fa-paper-plane" onclick="handleChatSubmit()"></i>
+      </div>
+      <div class="chat-file-upload">
+        <input type="file" id="fileInput" accept=".pdf,.docx,.txt" onchange="handleFileUpload()" />
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function openChatModal() {
+      document.getElementById("chatModal").style.display = "flex";
+    }
+
+    function closeChatModal() {
+      document.getElementById("chatModal").style.display = "none";
+    }
+
+    function appendToChat(message, sender = "user") {
+      const chatbox = document.getElementById("chatbox");
+      const msg = document.createElement("div");
+      msg.innerHTML = `<strong>${sender === "user" ? 'You' : 'AI'}:</strong> ${message}`;
+      chatbox.appendChild(msg);
+      chatbox.scrollTop = chatbox.scrollHeight;
+    }
+
+    function handleChatSubmit() {
+      const input = document.getElementById("chatInput").value.trim();
+      if (input) {
+        appendToChat(input, "user");
+        callAzureAI({ text: input });
+        document.getElementById("chatInput").value = "";
+      }
+    }
+
+    function handleFileUpload() {
+      const file = document.getElementById("fileInput").files[0];
+      if (file) {
+        appendToChat(`Uploaded file: ${file.name}`, "user");
+        callAzureAI({ file });
+      }
+    }
+
+    function startVoiceDictation() {
+      const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+      recognition.lang = 'en-US';
+      recognition.onresult = function(event) {
+        const transcript = event.results[0][0].transcript;
+        document.getElementById("chatInput").value = transcript;
+        appendToChat(transcript, "user");
+        callAzureAI({ text: transcript });
+      };
+      recognition.onerror = function(event) {
+        alert("Voice error: " + event.error);
+      };
+      recognition.start();
+    }
+
+    async function callAzureAI({ text = null, file = null }) {
+      appendToChat("Analyzing your input...", "AI");
+
+      // Simulated response
+      const simulatedData = {
+        supplierName: "Acme Corp",
+        contractTitle: "Annual Software Maintenance",
+        type: "MSA",
+        startDate: "2025-07-01",
+        endDate: "2026-06-30",
+        value: 50000,
+        paymentTerms: "Net 30",
+        department: "IT",
+        email: "requester@company.com",
+        stakeholders: "IT Director, Legal Counsel",
+        justification: "Renewal of maintenance agreement.",
+        risk: "Yes"
+      };
+      fillForm(simulatedData);
+      appendToChat("Form updated with extracted details.", "AI");
+
+      /*
+      // Uncomment for real Azure OpenAI (Text)
+      if (text) {
+        const response = await fetch("https://<your-azure-endpoint>.openai.azure.com/openai/deployments/<deployment-id>/chat/completions?api-version=2024-02-15-preview", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "api-key": "<your-api-key>"
+          },
+          body: JSON.stringify({
+            messages: [
+              { role: "system", content: "Extract supplier contract request information as JSON." },
+              { role: "user", content: text }
+            ],
+            temperature: 0.2,
+            max_tokens: 500
+          })
+        });
+        const result = await response.json();
+        const jsonResponse = JSON.parse(result.choices[0].message.content);
+        fillForm(jsonResponse);
+        appendToChat("Form updated with extracted details.", "AI");
+      }
+
+      // Uncomment for file (custom API)
+      if (file) {
+        const formData = new FormData();
+        formData.append("file", file);
+        const response = await fetch("https://<your-custom-api-endpoint>/analyze-document", {
+          method: "POST",
+          headers: {
+            "Authorization": "Bearer <your-api-key>"
+          },
+          body: formData
+        });
+        const data = await response.json();
+        fillForm(data);
+        appendToChat("Form updated with extracted details from file.", "AI");
+      }
+      */
+    }
+
+    function fillForm(data) {
+      document.getElementById("supplierName").value = data.supplierName || "";
+      document.getElementById("contractTitle").value = data.contractTitle || "";
+      document.getElementById("type").value = data.type || "";
+      document.getElementById("startDate").value = data.startDate || "";
+      document.getElementById("endDate").value = data.endDate || "";
+      document.getElementById("value").value = data.value || "";
+      document.getElementById("paymentTerms").value = data.paymentTerms || "";
+      document.getElementById("department").value = data.department || "";
+      document.getElementById("email").value = data.email || "";
+      document.getElementById("stakeholders").value = data.stakeholders || "";
+      document.getElementById("justification").value = data.justification || "";
+      document.getElementById("risk").value = data.risk || "";
+    }
+  </script>
+
+</body>
+</html>
