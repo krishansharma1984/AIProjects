@@ -26,7 +26,7 @@
       max-width: 900px;
       margin: 0 auto 20px auto;
     }
-.form-submit {
+    .form-submit {
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -45,15 +45,15 @@
       font-size: 14px;
     }
 
-.form-submit button {
-     background: var(--brand-color);
-    color: white;
-    border: none;
-    padding: 8px 12px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 18px;
-    width: 100px;
+    .form-submit button {
+      background: var(--brand-color);
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 18px;
+      width: 100px;
     }
 
     .form-container {
@@ -226,13 +226,12 @@
       <label>Justification</label>
       <textarea id="justification" rows="3"></textarea>
     </div>
-   
   </form>
-<div class="form-submit">
-    <h2></h2>
-       <button type="button" class="btn btn-lg" onclick="alert('Submitted Successfully')">Submit</button>
-  </div>
 
+  <div class="form-submit">
+    <h2></h2>
+    <button type="button" class="btn btn-lg" onclick="alert('Submitted Successfully')">Submit</button>
+  </div>
 
   <!-- Chat Modal -->
   <div id="chatModal" class="chat-modal">
@@ -250,7 +249,7 @@
         <i class="fas fa-paper-plane" onclick="handleChatSubmit()"></i>
       </div>
       <div class="chat-file-upload">
-        <input type="file" id="fileInput" accept=".pdf,.docx,.txt" onchange="handleFileUpload()" />
+        <input type="file" id="fileInput" accept=".pdf,.docx,.txt,audio/*" onchange="handleFileUpload()" />
       </div>
     </div>
   </div>
@@ -307,81 +306,93 @@
     async function callAzureAI({ text = null, file = null }) {
       appendToChat("Analyzing your input...", "AI");
 
-      // Simulated response
-      const simulatedData = {
-        supplierName: "Acme Corp",
-        contractTitle: "Annual Software Maintenance",
-        type: "MSA",
-        startDate: "2025-07-01",
-        endDate: "2026-06-30",
-        value: 50000,
-        paymentTerms: "Net 30",
-        department: "IT",
-        email: "requester@company.com",
-        stakeholders: "IT Director, Legal Counsel",
-        justification: "Renewal of maintenance agreement.",
-        risk: "Yes"
-      };
-      fillForm(simulatedData);
-      appendToChat("Form updated with extracted details.", "AI");
+      const apiKey = "MyKrishanAPIKeyWithComplexNameWithNoBodyGuessOnPlanetEarthIncludingMars";
+      const baseUrl = "https://documentparserapi20250524115701-b8ereadadvfebmfs.canadacentral-01.azurewebsites.net/api/document";
 
-      /*
-      // Uncomment for real Azure OpenAI (Text)
-      if (text) {
-        const response = await fetch("https://<your-azure-endpoint>.openai.azure.com/openai/deployments/<deployment-id>/chat/completions?api-version=2024-02-15-preview", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "api-key": "<your-api-key>"
-          },
-          body: JSON.stringify({
-            messages: [
-              { role: "system", content: "Extract supplier contract request information as JSON." },
-              { role: "user", content: text }
-            ],
-            temperature: 0.2,
-            max_tokens: 500
-          })
-        });
-        const result = await response.json();
-        const jsonResponse = JSON.parse(result.choices[0].message.content);
-        fillForm(jsonResponse);
-        appendToChat("Form updated with extracted details.", "AI");
-      }
+      try {
+        let response, data;
 
-      // Uncomment for file (custom API)
-      if (file) {
-        const formData = new FormData();
-        formData.append("file", file);
-        const response = await fetch("https://<your-custom-api-endpoint>/analyze-document", {
-          method: "POST",
-          headers: {
-            "Authorization": "Bearer <your-api-key>"
-          },
-          body: formData
-        });
-        const data = await response.json();
-        fillForm(data);
-        appendToChat("Form updated with extracted details from file.", "AI");
+        if (file) {
+          let endpoint = "";
+          if (file.type === "application/pdf") {
+            endpoint = "/parse-pdf";
+          } else if (file.type.startsWith("audio/")) {
+            endpoint = "/parse-audio";
+          } else if (file.type === "text/plain" || file.name.endsWith(".txt")) {
+            // Read text content from the file
+            const textContent = await file.text();
+            response = await fetch(baseUrl + "/parse-text", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "x-api-key": apiKey
+              },
+              body: JSON.stringify({ text: textContent })
+            });
+            data = await response.json();
+            fillForm(data);
+            appendToChat("Form updated with extracted details from text file.", "AI");
+            return;
+          } else {
+            appendToChat("Unsupported file type.", "AI");
+            return;
+          }
+
+          const formData = new FormData();
+          if (endpoint === "/parse-pdf") {
+            formData.append("pdfFile", file);
+          } else if (endpoint === "/parse-audio") {
+            formData.append("audioFile", file);
+          }
+
+          response = await fetch(baseUrl + endpoint, {
+            method: "POST",
+            headers: {
+              "x-api-key": apiKey
+            },
+            body: formData
+          });
+
+          data = await response.json();
+          fillForm(data);
+          appendToChat("Form updated with extracted details from uploaded file.", "AI");
+
+        } else if (text) {
+          response = await fetch(baseUrl + "/parse-text", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "x-api-key": apiKey
+            },
+            body: JSON.stringify({ text })
+          });
+          data = await response.json();
+          fillForm(data);
+          appendToChat("Form updated with extracted details from text input.", "AI");
+        } else {
+          appendToChat("No input provided.", "AI");
+        }
+      } catch (error) {
+        appendToChat("Error calling API: " + error.message, "AI");
       }
-      */
     }
 
     function fillForm(data) {
-      document.getElementById("supplierName").value = data.supplierName || "";
-      document.getElementById("contractTitle").value = data.contractTitle || "";
-      document.getElementById("type").value = data.type || "";
-      document.getElementById("startDate").value = data.startDate || "";
-      document.getElementById("endDate").value = data.endDate || "";
-      document.getElementById("value").value = data.value || "";
-      document.getElementById("paymentTerms").value = data.paymentTerms || "";
-      document.getElementById("department").value = data.department || "";
-      document.getElementById("email").value = data.email || "";
-      document.getElementById("stakeholders").value = data.stakeholders || "";
-      document.getElementById("justification").value = data.justification || "";
-      document.getElementById("risk").value = data.risk || "";
+      if (!data) return;
+
+      if (data.supplierName) document.getElementById("supplierName").value = data.supplierName;
+      if (data.contractTitle) document.getElementById("contractTitle").value = data.contractTitle;
+      if (data.type) document.getElementById("type").value = data.type;
+      if (data.department) document.getElementById("department").value = data.department;
+      if (data.startDate) document.getElementById("startDate").value = data.startDate;
+      if (data.endDate) document.getElementById("endDate").value = data.endDate;
+      if (data.value) document.getElementById("value").value = data.value;
+      if (data.paymentTerms) document.getElementById("paymentTerms").value = data.paymentTerms;
+      if (data.email) document.getElementById("email").value = data.email;
+      if (data.risk) document.getElementById("risk").value = data.risk;
+      if (data.stakeholders) document.getElementById("stakeholders").value = data.stakeholders;
+      if (data.justification) document.getElementById("justification").value = data.justification;
     }
   </script>
-
 </body>
 </html>
