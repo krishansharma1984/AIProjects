@@ -1,17 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Supplier Contract Request</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <style>
-    :root { --brand-color: #b68835; }
+    :root {
+      --brand-color: #b68835;
+    }
 
     body {
       font-family: Arial, sans-serif;
       background: #f9f9f9;
-      margin: 0; padding: 20px; color: #333;
+      margin: 0;
+      padding: 20px;
+      color: #333;
     }
 
     h2 {
@@ -26,6 +31,7 @@
       max-width: 900px;
       margin: 0 auto 20px auto;
     }
+
     .form-submit {
       display: flex;
       justify-content: space-between;
@@ -76,7 +82,9 @@
       flex-direction: column;
     }
 
-    input, select, textarea {
+    input,
+    select,
+    textarea {
       padding: 8px;
       border: 1px solid #ccc;
       border-radius: 4px;
@@ -94,7 +102,10 @@
     .chat-modal {
       display: none;
       position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
       background: rgba(0, 0, 0, 0.4);
       justify-content: center;
       align-items: center;
@@ -109,7 +120,7 @@
       border: 2px solid var(--brand-color);
       display: flex;
       flex-direction: column;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     }
 
     .chat-header {
@@ -159,8 +170,18 @@
     .chat-file-upload input {
       width: 96%;
     }
+    @keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.blinking {
+  animation: blink 1s infinite;
+}
+
   </style>
 </head>
+
 <body>
 
   <div class="form-header">
@@ -245,16 +266,52 @@
       </div>
       <div class="chat-input-area">
         <input type="text" id="chatInput" placeholder="Type your request..." />
-        <i class="fas fa-microphone" onclick="startVoiceDictation()"></i>
+        <i id="micIcon" class="fas fa-microphone" onclick="startVoiceDictation()"></i>
+        <i id="stopIcon" class="fas fa-stop" style="display: none;" onclick="stopVoiceDictation()"></i>
         <i class="fas fa-paper-plane" onclick="handleChatSubmit()"></i>
       </div>
       <div class="chat-file-upload">
         <input type="file" id="fileInput" accept=".pdf,.docx,.txt,audio/*" onchange="handleFileUpload()" />
+
       </div>
     </div>
   </div>
 
+  <div id="loaderOverlay" style="
+  display: none;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(255,255,255,0.7);
+  z-index: 1000;
+  justify-content: center;
+  align-items: center;
+  font-size: 24px;
+  color: var(--brand-color);
+">
+    <i class="fas fa-spinner fa-spin"></i>&nbsp;Extracting information...
+  </div>
+
+  <div id="voiceLoader"
+    style="display:none; position:fixed; bottom:100px; right:30px; background: rgba(255,255,255,0.9); padding: 10px 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.2); font-weight: bold; color: #b68835; z-index: 1000;">
+    <i class="fas fa-spinner fa-spin"></i> Listening...
+  </div>
+
+
+
+
   <script>
+    let voiceText = ""
+    function showLoader() {
+      document.getElementById("loaderOverlay").style.display = "flex";
+    }
+    function hideLoader() {
+      setTimeout(() => {
+        document.getElementById("loaderOverlay").style.display = "none";
+      }, 200);
+
+    }
+
     function openChatModal() {
       document.getElementById("chatModal").style.display = "flex";
     }
@@ -271,36 +328,76 @@
       chatbox.scrollTop = chatbox.scrollHeight;
     }
 
-    function handleChatSubmit() {
+    async function handleChatSubmit() {
+      voiceText = ""
       const input = document.getElementById("chatInput").value.trim();
       if (input) {
+        showLoader()
         appendToChat(input, "user");
-        callAzureAI({ text: input });
+        await callAzureAI({ text: input });
         document.getElementById("chatInput").value = "";
+        hideLoader()
       }
     }
 
-    function handleFileUpload() {
+    async function handleFileUpload() {
       const file = document.getElementById("fileInput").files[0];
       if (file) {
+        showLoader()
         appendToChat(`Uploaded file: ${file.name}`, "user");
-        callAzureAI({ file });
+        await callAzureAI({ file });
+        hideLoader()
       }
     }
 
+    let recognition;
+
     function startVoiceDictation() {
-      const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+      recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
       recognition.lang = 'en-US';
-      recognition.onresult = function(event) {
-        const transcript = event.results[0][0].transcript;
-        document.getElementById("chatInput").value = transcript;
-        appendToChat(transcript, "user");
-        callAzureAI({ text: transcript });
+      recognition.continuous = true; // Keep listening even with pauses
+      recognition.interimResults = false;
+
+      //document.getElementById("voiceLoader").style.display = "block"; // Show loader
+
+      // Toggle icons
+      document.getElementById("micIcon").style.display = "none";
+      const stopIcon = document.getElementById("stopIcon");
+  stopIcon.style.display = "inline";
+  stopIcon.classList.add("blinking");
+
+      recognition.onresult = function (event) {
+        const transcript = Array.from(event.results)
+          .map(result => result[0].transcript)
+          .join(" ");
+        voiceText = voiceText + " " + transcript
+        document.getElementById("chatInput").value = voiceText;
+        //appendToChat(transcript, "user");
+        //await callAzureAI({ text: transcript });
+        //document.getElementById("voiceLoader").style.display = "none"; // Hide loader
       };
-      recognition.onerror = function(event) {
+      recognition.onerror = function (event) {
+        //document.getElementById("voiceLoader").style.display = "none"; // Hide loader
         alert("Voice error: " + event.error);
+
+      };
+      recognition.onend = function () {
+        //document.getElementById("voiceLoader").style.display = "none"; // Hide loader if user stops
       };
       recognition.start();
+    }
+
+    function stopVoiceDictation() {
+      if (recognition) {
+        recognition.stop();
+      }
+      //document.getElementById("voiceLoader").style.display = "none";
+
+      // Toggle icons back
+      document.getElementById("micIcon").style.display = "inline";
+      const stopIcon = document.getElementById("stopIcon");
+  stopIcon.style.display = "none";
+  stopIcon.classList.remove("blinking");
     }
 
     async function callAzureAI({ text = null, file = null }) {
@@ -395,4 +492,5 @@
     }
   </script>
 </body>
+
 </html>
