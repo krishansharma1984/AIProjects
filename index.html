@@ -59,6 +59,638 @@
       border-radius: 5px;
       cursor: pointer;
       font-size: 18px;
+      width: 110px;
+    }
+
+    .form-container {
+      max-width: 900px;
+      margin: auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      padding-bottom: 30px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 4px;
+      font-weight: bold;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    input,
+    select,
+    textarea {
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    textarea {
+      resize: vertical;
+    }
+
+    .full-width {
+      grid-column: span 2;
+    }
+
+    /* Chat toggle button */
+    .chat-toggle {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: var(--brand-color);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      padding: 16px;
+      font-size: 20px;
+      cursor: pointer;
+      z-index: 1000;
+    }
+
+    /* Floating chat box */
+    .chat-widget {
+      position: fixed;
+      bottom: 80px;
+      right: 20px;
+      width: 300px;
+      height: 400px;
+      background: white;
+      border: 2px solid var(--brand-color);
+      border-radius: 10px;
+      display: none;
+      flex-direction: column;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      z-index: 999;
+    }
+
+    .chat-position {
+      position: fixed !important;
+      bottom: 5em !important;
+      right: 1em !important;
+    }
+
+    /* Modal Styles */
+    .chat-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.4);
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
+    }
+
+    .chat-box {
+      width: 400px;
+      height: 480px;
+      background: white;
+      border-radius: 10px;
+      border: 2px solid var(--brand-color);
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .chat-header {
+      background: var(--brand-color);
+      color: white;
+      padding: 10px;
+      border-radius: 10px 10px 0 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .chatbox {
+      flex: 1;
+      padding: 10px;
+      overflow-y: auto;
+      font-size: 14px;
+    }
+
+    .chat-input-area {
+      display: flex;
+      align-items: center;
+      padding: 8px;
+      border-top: 1px solid #ddd;
+    }
+
+    .chat-input-area input[type="text"] {
+      flex: 1;
+      padding: 8px;
+      border-radius: 20px;
+      border: 1px solid #ccc;
+    }
+
+    .chat-input-area i {
+      font-size: 18px;
+      color: var(--brand-color);
+      margin-left: 10px;
+      cursor: pointer;
+    }
+
+    .chat-file-upload {
+      padding: 8px 10px;
+      border-top: 1px solid #eee;
+      text-align: center;
+    }
+
+    .chat-file-upload input {
+      width: 96%;
+    }
+
+    @keyframes blink {
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0.3;
+      }
+    }
+
+    .blinking {
+      animation: blink 1s infinite;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 250px;
+      height: 100%;
+      background-color: #333;
+      color: white;
+      padding: 20px 15px;
+      box-sizing: border-box;
+      z-index: 900;
+    }
+
+    .sidebar h3 {
+      margin-top: 0;
+    }
+
+    .sidebar ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .sidebar li {
+      margin: 10px 0;
+      background: radial-gradient(black, transparent);
+      padding: 10px;
+    }
+
+    .sidebar a {
+      color: white;
+      text-decoration: none;
+    }
+
+    .sidebar a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Sidebar Navigation -->
+  <div class="sidebar">
+    <h2>Intranet Portal</h2>
+    <ul>
+      <li><a href="#">Employee Hub</a></li>
+      <li><a href="#">Contracts Request</a></li>
+      <li><a href="#">Suppliers Creation</a></li>
+      <li><a href="#">Access Card Request</a></li>
+      <li><a href="#">IT Requistion</a></li>
+      <li><a href="#">Security Clearance Request</a></li>
+      <li><a href="#">Card & Cash Request</a></li>
+      <li><a href="#">Leave Tracking System</a></li>
+      <li><a href="#">E-Ticket Request</a></li>
+      <li><a href="#">Visa Request System</a></li>
+      <li><a href="#">Life Insurance</a></li>
+      <li><a href="#">Attendance</a></li>
+      <li><a href="#">PAM</a></li>
+    </ul>
+  </div>
+
+  <div class="form-header">
+    <h2>Supplier Contract Request Form</h2>
+    <button onclick="openChatModal()"><i class="fa-solid fa-wand-magic-sparkles"></i> Pre-populate using AI</button>
+  </div>
+
+  <form id="contractForm" class="form-container">
+    <div class="form-group">
+      <label>Supplier Name</label>
+      <input type="text" id="supplierName" />
+    </div>
+    <div class="form-group">
+      <label>Contract Title</label>
+      <input type="text" id="contractTitle" />
+    </div>
+    <div class="form-group">
+      <label>Contract Type</label>
+      <select id="type">
+        <option value="">Select</option>
+        <option value="NDA">NDA</option>
+        <option value="SOW">Statement of Work</option>
+        <option value="MSA">Master Services Agreement</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Department</label>
+      <input type="text" id="department" />
+    </div>
+    <div class="form-group">
+      <label>Start Date</label>
+      <input type="date" id="startDate" />
+    </div>
+    <div class="form-group">
+      <label>End Date</label>
+      <input type="date" id="endDate" />
+    </div>
+    <div class="form-group">
+      <label>Contract Value (USD)</label>
+      <input type="number" id="value" />
+    </div>
+    <div class="form-group">
+      <label>Payment Terms</label>
+      <input type="text" id="paymentTerms" />
+    </div>
+    <div class="form-group">
+      <label>Requester Email</label>
+      <input type="email" id="email" />
+    </div>
+    <div class="form-group">
+      <label>Risk Assessment Required</label>
+      <select id="risk">
+        <option value="">Select</option>
+        <option value="Yes">Yes</option>
+        <option value="No">No</option>
+      </select>
+    </div>
+    <div class="form-group full-width">
+      <label>Internal Stakeholders</label>
+      <textarea id="stakeholders" rows="2"></textarea>
+    </div>
+    <div class="form-group full-width">
+      <label>Justification</label>
+      <textarea id="justification" rows="3"></textarea>
+    </div>
+  </form>
+
+  <div class="form-submit">
+    <h2></h2>
+    <button type="button" class="btn btn-lg" onclick="alert('Submitted Successfully')"><i class="fa-solid fa-check"></i> Submit</button>
+  </div>
+
+  <!-- Floating Chat Button -->
+  <button class="chat-toggle" onclick="toggleChat(true)">
+    <i class="fas fa-comments"></i>
+  </button>
+
+  <!-- Chat Modal -->
+  <div id="chatModal" class="chat-modal">
+    <div class="chat-box" id="chatWidget">
+      <div class="chat-header">
+        Chat Assistant
+        <i class="fas fa-times" onclick="closeChatModal()"></i>
+      </div>
+      <div class="chatbox" id="chatbox">
+        <p><em>Upload a document or describe the request to auto-populate.</em></p>
+      </div>
+      <div class="chat-input-area">
+        <input type="text" id="chatInput" placeholder="Type your request..." />
+        <i id="micIcon" class="fas fa-microphone" onclick="startVoiceDictation()"></i>
+        <i id="stopIcon" class="fas fa-stop" style="display: none;" onclick="stopVoiceDictation()"></i>
+        <i class="fas fa-paper-plane" onclick="handleChatSubmit()"></i>
+      </div>
+      <div class="chat-file-upload">
+        <input type="file" id="fileInput" accept=".pdf,.docx,.txt,audio/*" onchange="handleFileUpload()" />
+
+      </div>
+    </div>
+  </div>
+
+  <div id="loaderOverlay" style="
+  display: none;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(255,255,255,0.7);
+  z-index: 1000;
+  justify-content: center;
+  align-items: center;
+  font-size: 24px;
+  color: var(--brand-color);
+">
+    <i class="fas fa-spinner fa-spin"></i>&nbsp;Extracting information...
+  </div>
+
+  <div id="voiceLoader"
+    style="display:none; position:fixed; bottom:100px; right:30px; background: rgba(255,255,255,0.9); padding: 10px 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.2); font-weight: bold; color: #b68835; z-index: 1000;">
+    <i class="fas fa-spinner fa-spin"></i> Listening...
+  </div>
+
+
+
+
+  <script>
+    function toggleChat(isBottomClicked = false) {
+      const widget = document.getElementById("chatWidget");
+      widget.style.display = widget.style.display === "flex" ? "none" : "flex";
+
+      /* if(widget.style.display === "flex"){
+        widget.classList.remove("chat-box");
+      }
+      else{
+        widget.classList.add("chat-box");
+      } */
+
+      const modal = document.getElementById("chatModal");
+      modal.style.display = modal.style.display === "flex" ? "none" : "flex";
+
+      if (isBottomClicked) {
+        widget.classList.add("chat-position");
+      }
+      else {
+        widget.classList.remove("chat-position");
+      }
+
+    }
+
+    let voiceText = ""
+    function showLoader() {
+      document.getElementById("loaderOverlay").style.display = "flex";
+    }
+    function hideLoader() {
+      setTimeout(() => {
+        document.getElementById("loaderOverlay").style.display = "none";
+      }, 200);
+
+    }
+
+    function openChatModal() {
+      toggleChat()
+      document.getElementById("chatModal").style.display = "flex";
+    }
+
+    function closeChatModal() {
+      toggleChat()
+      document.getElementById("chatModal").style.display = "none";
+
+    }
+
+    function appendToChat(message, sender = "user") {
+      const chatbox = document.getElementById("chatbox");
+      const msg = document.createElement("div");
+      msg.innerHTML = `<strong>${sender === "user" ? 'You' : 'AI'}:</strong> ${message}`;
+      chatbox.appendChild(msg);
+      chatbox.scrollTop = chatbox.scrollHeight;
+    }
+
+    async function handleChatSubmit() {
+      voiceText = ""
+      const input = document.getElementById("chatInput").value.trim();
+      if (input) {
+        showLoader()
+        appendToChat(input, "user");
+        await callAzureAI({ text: input });
+        document.getElementById("chatInput").value = "";
+        hideLoader()
+      }
+    }
+
+    async function handleFileUpload() {
+      const file = document.getElementById("fileInput").files[0];
+      if (file) {
+        showLoader()
+        appendToChat(`Uploaded file: ${file.name}`, "user");
+        await callAzureAI({ file });
+        hideLoader()
+      }
+    }
+
+    let recognition;
+
+    function startVoiceDictation() {
+      recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+      recognition.lang = 'en-US';
+      recognition.continuous = true; // Keep listening even with pauses
+      recognition.interimResults = false;
+
+      //document.getElementById("voiceLoader").style.display = "block"; // Show loader
+
+      // Toggle icons
+      document.getElementById("micIcon").style.display = "none";
+      const stopIcon = document.getElementById("stopIcon");
+      stopIcon.style.display = "inline";
+      stopIcon.classList.add("blinking");
+
+      recognition.onresult = function (event) {
+        const transcript = Array.from(event.results)
+          .map(result => result[0].transcript)
+          .join(" ");
+        voiceText = voiceText + " " + transcript
+        document.getElementById("chatInput").value = voiceText;
+        //appendToChat(transcript, "user");
+        //await callAzureAI({ text: transcript });
+        //document.getElementById("voiceLoader").style.display = "none"; // Hide loader
+      };
+      recognition.onerror = function (event) {
+        //document.getElementById("voiceLoader").style.display = "none"; // Hide loader
+        alert("Voice error: " + event.error);
+
+      };
+      recognition.onend = function () {
+        //document.getElementById("voiceLoader").style.display = "none"; // Hide loader if user stops
+      };
+      recognition.start();
+    }
+
+    function stopVoiceDictation() {
+      if (recognition) {
+        recognition.stop();
+      }
+      //document.getElementById("voiceLoader").style.display = "none";
+
+      // Toggle icons back
+      document.getElementById("micIcon").style.display = "inline";
+      const stopIcon = document.getElementById("stopIcon");
+      stopIcon.style.display = "none";
+      stopIcon.classList.remove("blinking");
+    }
+
+    async function callAzureAI({ text = null, file = null }) {
+
+      appendToChat("Analyzing your input...", "AI");
+
+      const apiKey = "MyKrishanAPIKeyWithComplexNameWithNoBodyGuessOnPlanetEarthIncludingMars";
+      const baseUrl = "https://documentparserapi20250524115701-b8ereadadvfebmfs.canadacentral-01.azurewebsites.net/api/document";
+
+      try {
+        let response, data;
+
+        if (file) {
+          let endpoint = "";
+          if (file.type === "application/pdf") {
+            endpoint = "/parse-pdf";
+          } else if (file.type.startsWith("audio/")) {
+            endpoint = "/parse-audio";
+          } else if (file.type === "text/plain" || file.name.endsWith(".txt")) {
+            // Read text content from the file
+            const textContent = await file.text();
+            response = await fetch(baseUrl + "/parse-text", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "x-api-key": apiKey
+              },
+              body: JSON.stringify({ text: textContent })
+            });
+            data = await response.json();
+            fillForm(data);
+            appendToChat("Form updated with extracted details from text file.", "AI");
+            return;
+          } else {
+            appendToChat("Unsupported file type.", "AI");
+            return;
+          }
+
+          const formData = new FormData();
+          if (endpoint === "/parse-pdf") {
+            formData.append("pdfFile", file);
+          } else if (endpoint === "/parse-audio") {
+            formData.append("audioFile", file);
+          }
+
+          response = await fetch(baseUrl + endpoint, {
+            method: "POST",
+            headers: {
+              "x-api-key": apiKey
+            },
+            body: formData
+          });
+
+          data = await response.json();
+          fillForm(data);
+          appendToChat("Form updated with extracted details from uploaded file.", "AI");
+
+        } else if (text) {
+          response = await fetch(baseUrl + "/parse-text", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "x-api-key": apiKey
+            },
+            body: JSON.stringify({ text })
+          });
+          data = await response.json();
+          fillForm(data);
+          appendToChat("Form updated with extracted details from text input.", "AI");
+        } else {
+          appendToChat("No input provided.", "AI");
+        }
+      } catch (error) {
+        appendToChat("Error calling API: " + error.message, "AI");
+      }
+    }
+
+    function fillForm(data) {
+      if (!data) return;
+
+      if (data.supplierName) document.getElementById("supplierName").value = data.supplierName;
+      if (data.contractTitle) document.getElementById("contractTitle").value = data.contractTitle;
+      if (data.type) document.getElementById("type").value = data.type;
+      if (data.department) document.getElementById("department").value = data.department;
+      if (data.startDate) document.getElementById("startDate").value = data.startDate;
+      if (data.endDate) document.getElementById("endDate").value = data.endDate;
+      if (data.value) document.getElementById("value").value = data.value;
+      if (data.paymentTerms) document.getElementById("paymentTerms").value = data.paymentTerms;
+      if (data.email) document.getElementById("email").value = data.email;
+      if (data.risk) document.getElementById("risk").value = data.risk;
+      if (data.stakeholders) document.getElementById("stakeholders").value = data.stakeholders;
+      if (data.justification) document.getElementById("justification").value = data.justification;
+    }
+  </script>
+</body>
+
+</html>
+
+On Mon, May 26, 2025 at 12:05 AM Anil Pal <anilpal706@gmail.com> wrote:
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Supplier Contract Request</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <style>
+    :root {
+      --brand-color: #b68835;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #f9f9f9;
+      margin: 0;
+      padding: 20px;
+      color: #333;
+    }
+
+    h2 {
+      color: var(--brand-color);
+      margin: 0;
+    }
+
+    .form-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 900px;
+      margin: 0 auto 20px auto;
+    }
+
+    .form-submit {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 900px;
+      margin: 0 auto 20px auto;
+    }
+
+
+    .form-header button {
+      background: var(--brand-color);
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .form-submit button {
+      background: var(--brand-color);
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 18px;
       width: 100px;
     }
 
