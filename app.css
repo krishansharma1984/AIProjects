@@ -1,0 +1,263 @@
+  :root {
+    --brand-color: #b68835;
+  }
+
+  body {
+    font-family: Arial, sans-serif;
+    background: #f9f9f9;
+    margin: 0;
+    padding: 20px;
+    color: #333;
+  }
+
+  h2 {
+    color: var(--brand-color);
+    margin: 0;
+  }
+
+  .form-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 900px;
+    margin: 0 auto 20px auto;
+  }
+
+  .form-submit {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 900px;
+    margin: 0 auto 20px auto;
+  }
+
+
+  .form-header button {
+    background: var(--brand-color);
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+
+  .form-submit button {
+    background: var(--brand-color);
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 18px;
+    width: 110px;
+  }
+
+  .form-container {
+    max-width: 900px;
+    margin: auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    padding-bottom: 30px;
+  }
+
+  label {
+    display: block;
+    margin-bottom: 4px;
+    font-weight: bold;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+  }
+
+  input,
+  select,
+  textarea {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+
+  textarea {
+    resize: vertical;
+  }
+
+  .full-width {
+    grid-column: span 2;
+  }
+
+  /* Chat toggle button */
+  .chat-toggle {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: var(--brand-color);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    padding: 16px;
+    font-size: 20px;
+    cursor: pointer;
+    z-index: 1000;
+  }
+
+  /* Floating chat box */
+  .chat-widget {
+    position: fixed;
+    bottom: 80px;
+    right: 20px;
+    width: 300px;
+    height: 400px;
+    background: white;
+    border: 2px solid var(--brand-color);
+    border-radius: 10px;
+    display: none;
+    flex-direction: column;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    z-index: 999;
+  }
+
+  .chat-position {
+    position: fixed !important;
+    bottom: 5em !important;
+    right: 1em !important;
+  }
+
+  /* Modal Styles */
+  .chat-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+  }
+
+  .chat-box {
+    width: 400px;
+    height: 480px;
+    background: white;
+    border-radius: 10px;
+    border: 2px solid var(--brand-color);
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
+
+  .chat-header {
+    background: var(--brand-color);
+    color: white;
+    padding: 10px;
+    border-radius: 10px 10px 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .chatbox {
+    flex: 1;
+    padding: 10px;
+    overflow-y: auto;
+    font-size: 14px;
+  }
+
+  .chat-input-area {
+    display: flex;
+    align-items: center;
+    padding: 8px;
+    border-top: 1px solid #ddd;
+  }
+
+  .chat-input-area input[type="text"] {
+    flex: 1;
+    padding: 8px;
+    border-radius: 20px;
+    border: 1px solid #ccc;
+  }
+
+  .chat-input-area i {
+    font-size: 18px;
+    color: var(--brand-color);
+    margin-left: 10px;
+    cursor: pointer;
+  }
+
+  .chat-file-upload {
+    padding: 8px 10px;
+    border-top: 1px solid #eee;
+    text-align: center;
+  }
+
+  .chat-file-upload input {
+    width: 96%;
+  }
+
+  @keyframes blink {
+
+    0%,
+    100% {
+      opacity: 1;
+    }
+
+    50% {
+      opacity: 0.3;
+    }
+  }
+
+  .blinking {
+    animation: blink 1s infinite;
+  }
+
+  /* Sidebar */
+  .sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 250px;
+    height: 100%;
+    background-color: #333;
+    color: white;
+    padding: 20px 15px;
+    box-sizing: border-box;
+    z-index: 900;
+  }
+
+  .sidebar h3 {
+    margin-top: 0;
+  }
+
+  .sidebar ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  .sidebar li {
+    margin: 10px 0;
+    background: radial-gradient(black, transparent);
+    padding: 10px;
+  }
+
+  .sidebar a {
+    color: white;
+    text-decoration: none;
+  }
+
+  .sidebar a:hover {
+    text-decoration: underline;
+  }
+
+  .btn-primary {
+    background-color: var(--brand-color) !important;
+    border-color: var(--brand-color) !important;
+  }
+  .components-class{
+    position: relative;
+    left: 9.5%;
+  }

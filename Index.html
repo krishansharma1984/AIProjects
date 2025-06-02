@@ -1,0 +1,416 @@
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Supplier Contract Request</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="app.css">
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vue-router@3.5.4/dist/vue-router.js"></script>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+</head>
+
+<body>
+  <!-- <a href="#" onclick="app.navigateTo('/create-ad-profile')">test</a> -->
+  <div id="app" class="container mt-5">
+
+    <!-- Sidebar Navigation -->
+    <div class="sidebar">
+      <h2><a href="Index.html">Intranet Portal</a></h2>
+      <ul>
+        <li><router-link to="/employee-hub">Employee Hub</router-link></li>
+        <li><router-link to="/contracts-request">Contracts Request</router-link></li>
+        <li><router-link to="/suppliers-creation">Suppliers Creation</router-link></li>
+        <li><router-link to="/request-access-card">Access Card Request</router-link></li>
+        <li><router-link to="/setup-workstation">IT Requisition</router-link></li>
+        <li><router-link to="/create-ad-profile">Security Clearance Request</router-link></li>
+        <li><router-link to="/card-cash-request">Card & Cash Request</router-link></li>
+        <li><router-link to="/leave-tracking">Leave Tracking System</router-link></li>
+        <li><router-link to="/e-ticket">E-Ticket Request</router-link></li>
+        <li><router-link to="/visa-request">Visa Request System</router-link></li>
+        <li><router-link to="/life-insurance">Life Insurance</router-link></li>
+        <li><router-link to="/assign-manager">Assign Manager</router-link></li>
+        <li><router-link to="/schedule-induction">Induction</router-link></li>
+      </ul>
+    </div>
+
+    <div class="components-class" v-if="!routeClicked">
+      <h2>Intranet Landing Page</h2>
+      <p>Welcome to the Intranet Landing section.</p>
+    </div>
+
+    <template v-else>
+      <div class="form-header">
+        <router-view></router-view>
+        <h2 style="display: none;">Supplier Contract Request Form</h2>
+        <button @click="openChatModal"><i class="fa-solid fa-wand-magic-sparkles"></i> Pre-populate using AI</button>
+      </div>
+
+      <form id="contractForm" class="form-container">
+        <div class="form-group">
+          <label>Supplier Name</label>
+          <input type="text" id="supplierName" v-model="form.supplierName">
+        </div>
+        <div class="form-group">
+          <label>Contract Title</label>
+          <input type="text" id="contractTitle" v-model="form.contractTitle">
+        </div>
+        <div class="form-group">
+          <label>Contract Type</label>
+          <select id="type" v-model="form.type">
+            <option value="">Select</option>
+            <option value="NDA">NDA</option>
+            <option value="SOW">Statement of Work</option>
+            <option value="MSA">Master Services Agreement</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Department</label>
+          <input type="text" id="department" v-model="form.department">
+        </div>
+        <div class="form-group">
+          <label>Start Date</label>
+          <input type="date" id="startDate" v-model="form.startDate">
+        </div>
+        <div class="form-group">
+          <label>End Date</label>
+          <input type="date" id="endDate" v-model="form.endDate">
+        </div>
+        <div class="form-group">
+          <label>Contract Value (USD)</label>
+          <input type="number" id="value" v-model="form.value">
+        </div>
+        <div class="form-group">
+          <label>Payment Terms</label>
+          <input type="text" id="paymentTerms" v-model="form.paymentTerms">
+        </div>
+        <div class="form-group">
+          <label>Requester Email</label>
+          <input type="email" id="email" v-model="form.email">
+        </div>
+        <div class="form-group">
+          <label>Risk Assessment Required</label>
+          <select id="risk" v-model="form.risk">
+            <option value="">Select</option>
+            <option value="Yes">Yes</option>
+            <option value="No">No</option>
+          </select>
+        </div>
+        <div class="form-group full-width">
+          <label>Internal Stakeholders</label>
+          <textarea id="stakeholders" rows="2" v-model="form.stakeholders"></textarea>
+        </div>
+        <div class="form-group full-width">
+          <label>Justification</label>
+          <textarea id="justification" rows="3" v-model="form.justification"></textarea>
+        </div>
+      </form>
+
+      <div class="form-submit">
+        <h2></h2>
+        <button type="button" class="btn btn-lg" @click="alert('Submitted Successfully')"><i
+            class="fa-solid fa-check"></i>
+          Submit</button>
+      </div>
+    </template>
+    <!-- Floating Chat Button -->
+    <button class="chat-toggle" @click="toggleChat(true)">
+      <i class="fas fa-comments"></i>
+    </button>
+
+    <!-- Chat Modal -->
+    <div id="chatModal" class="chat-modal" style="display: none;">
+      <div class="chat-box" id="chatWidget" style="display: none;">
+        <div class="chat-header">
+          Chat Assistant
+          <i class="fas fa-times" @click="closeChatModal()"></i>
+        </div>
+        <div class="chatbox" id="chatbox">
+          <p>
+          <div v-html="isBottomChatClicked?chatMessages[1].text:chatMessages[0].text"></div>
+          </p>
+          <div v-html="chatBoxHTML"></div>
+        </div>
+        <div class="chat-input-area">
+          <input type="text" id="chatInput" placeholder="Type your request..." v-model="chatInput">
+          <i id="micIcon" class="fas fa-microphone" @click="startVoiceDictation()"></i>
+          <i id="stopIcon" class="fas fa-stop" style="display: none;" @click="stopVoiceDictation()"></i>
+          <i class="fas fa-paper-plane" @click="handleChatSubmit()"></i>
+        </div>
+        <div class="chat-file-upload">
+          <input type="file" id="fileInput" accept=".pdf,.docx,.txt,audio/*" @change="handleFileUpload()">
+
+        </div>
+      </div>
+    </div>
+
+    <div id="loaderOverlay" style="
+  display: none;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(255,255,255,0.7);
+  z-index: 1000;
+  justify-content: center;
+  align-items: center;
+  font-size: 24px;
+  color: var(--brand-color);
+">
+      <i class="fas fa-spinner fa-spin"></i>&nbsp;Extracting information...
+    </div>
+
+    <div id="voiceLoader"
+      style="display:none; position:fixed; bottom:100px; right:30px; background: rgba(255,255,255,0.9); padding: 10px 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.2); font-weight: bold; color: #b68835; z-index: 1000;">
+      <i class="fas fa-spinner fa-spin"></i> Listening...
+    </div>
+
+
+
+
+  </div>
+
+
+  <!--   <script>
+    function toggleChat(isBottomClicked = false) {
+      const widget = document.getElementById("chatWidget");
+      widget.style.display = widget.style.display === "flex" ? "none" : "flex";
+
+      /* if(widget.style.display === "flex"){
+        widget.classList.remove("chat-box");
+      }
+      else{
+        widget.classList.add("chat-box");
+      } */
+
+      const modal = document.getElementById("chatModal");
+      modal.style.display = modal.style.display === "flex" ? "none" : "flex";
+
+      if (isBottomClicked) {
+        widget.classList.add("chat-position");
+      }
+      else {
+        widget.classList.remove("chat-position");
+      }
+
+    }
+
+    let voiceText = ""
+    function showLoader() {
+      document.getElementById("loaderOverlay").style.display = "flex";
+    }
+    function hideLoader() {
+      setTimeout(() => {
+        document.getElementById("loaderOverlay").style.display = "none";
+      }, 200);
+
+    }
+
+    function openChatModal() {
+      toggleChat()
+      document.getElementById("chatModal").style.display = "flex";
+    }
+
+    function closeChatModal() {
+      toggleChat()
+      document.getElementById("chatModal").style.display = "none";
+
+    }
+
+    function appendToChat(message, sender = "user") {
+      const chatbox = document.getElementById("chatbox");
+      const msg = document.createElement("div");
+      msg.innerHTML = `<strong>${sender === "user" ? 'You' : 'AI'}:</strong> ${message}`;
+      chatbox.appendChild(msg);
+      chatbox.scrollTop = chatbox.scrollHeight;
+    }
+
+    async function handleChatSubmit() {
+      voiceText = ""
+      const input = document.getElementById("chatInput").value.trim();
+      if (input) {
+        showLoader()
+        appendToChat(input, "user");
+        await callAzureAI({ text: input });
+        document.getElementById("chatInput").value = "";
+        hideLoader()
+      }
+    }
+
+    async function handleFileUpload() {
+      const file = document.getElementById("fileInput").files[0];
+      if (file) {
+        showLoader()
+        appendToChat(`Uploaded file: ${file.name}`, "user");
+        await callAzureAI({ file });
+        hideLoader()
+      }
+    }
+
+    let recognition;
+
+    function startVoiceDictation() {
+      recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+      recognition.lang = 'en-US';
+      recognition.continuous = true; // Keep listening even with pauses
+      recognition.interimResults = false;
+
+      //document.getElementById("voiceLoader").style.display = "block"; // Show loader
+
+      // Toggle icons
+      document.getElementById("micIcon").style.display = "none";
+      const stopIcon = document.getElementById("stopIcon");
+      stopIcon.style.display = "inline";
+      stopIcon.classList.add("blinking");
+
+      recognition.onresult = function (event) {
+        const transcript = Array.from(event.results)
+          .map(result => result[0].transcript)
+          .join(" ");
+        voiceText = voiceText + " " + transcript
+        document.getElementById("chatInput").value = voiceText;
+        //appendToChat(transcript, "user");
+        //await callAzureAI({ text: transcript });
+        //document.getElementById("voiceLoader").style.display = "none"; // Hide loader
+      };
+      recognition.onerror = function (event) {
+        //document.getElementById("voiceLoader").style.display = "none"; // Hide loader
+        alert("Voice error: " + event.error);
+
+      };
+      recognition.onend = function () {
+        //document.getElementById("voiceLoader").style.display = "none"; // Hide loader if user stops
+      };
+      recognition.start();
+    }
+
+    function stopVoiceDictation() {
+      if (recognition) {
+        recognition.stop();
+      }
+      //document.getElementById("voiceLoader").style.display = "none";
+
+      // Toggle icons back
+      document.getElementById("micIcon").style.display = "inline";
+      const stopIcon = document.getElementById("stopIcon");
+      stopIcon.style.display = "none";
+      stopIcon.classList.remove("blinking");
+    }
+
+    async function callAzureAI({ text = null, file = null }) {
+
+      appendToChat("Analyzing your input...", "AI");
+
+      const apiKey = "Test@123";
+      const baseUrl = "https://documentparserapi20250524115701-b8ereadadvfebmfs.canadacentral-01.azurewebsites.net/api/document";
+
+      try {
+        let response, data;
+
+        if (file) {
+          let endpoint = "";
+          if (file.type === "application/pdf") {
+            endpoint = "/parse-pdf";
+          } else if (file.type.startsWith("audio/")) {
+            endpoint = "/parse-audio";
+          } else if (file.type === "text/plain" || file.name.endsWith(".txt")) {
+            // Read text content from the file
+            const textContent = await file.text();
+            response = await fetch(baseUrl + "/parse-text", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "x-api-key": apiKey
+              },
+              body: JSON.stringify({ text: textContent })
+            });
+            data = await response.json();
+            fillForm(data);
+            appendToChat("Form updated with extracted details from text file.", "AI");
+            return;
+          } else {
+            appendToChat("Unsupported file type.", "AI");
+            return;
+          }
+
+          const formData = new FormData();
+          if (endpoint === "/parse-pdf") {
+            formData.append("pdfFile", file);
+          } else if (endpoint === "/parse-audio") {
+            formData.append("audioFile", file);
+          }
+
+          response = await fetch(baseUrl + endpoint, {
+            method: "POST",
+            headers: {
+              "x-api-key": apiKey
+            },
+            body: formData
+          });
+
+          data = await response.json();
+          fillForm(data);
+          appendToChat("Form updated with extracted details from uploaded file.", "AI");
+
+        } else if (text) {
+          response = await fetch(baseUrl + "/parse-text", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "x-api-key": apiKey
+            },
+            body: JSON.stringify({ text })
+          });
+          data = await response.json();
+          fillForm(data);
+          appendToChat("Form updated with extracted details from text input.", "AI");
+        } else {
+          appendToChat("No input provided.", "AI");
+        }
+      } catch (error) {
+        appendToChat("Error calling API: " + error.message, "AI");
+      }
+    }
+
+    function fillForm(data) {
+      if (!data) return;
+
+      if (data.supplierName) document.getElementById("supplierName").value = data.supplierName;
+      if (data.contractTitle) document.getElementById("contractTitle").value = data.contractTitle;
+      if (data.type) document.getElementById("type").value = data.type;
+      if (data.department) document.getElementById("department").value = data.department;
+      if (data.startDate) document.getElementById("startDate").value = data.startDate;
+      if (data.endDate) document.getElementById("endDate").value = data.endDate;
+      if (data.value) document.getElementById("value").value = data.value;
+      if (data.paymentTerms) document.getElementById("paymentTerms").value = data.paymentTerms;
+      if (data.email) document.getElementById("email").value = data.email;
+      if (data.risk) document.getElementById("risk").value = data.risk;
+      if (data.stakeholders) document.getElementById("stakeholders").value = data.stakeholders;
+      if (data.justification) document.getElementById("justification").value = data.justification;
+    }
+  </script> -->
+
+
+
+</body>
+
+
+<!-- Load components -->
+<script src="components/employee-hub.js"></script>
+<script src="components/contracts-request.js"></script>
+<script src="components/suppliers-creation.js"></script>
+<script src="components/access-card-request.js"></script>
+<script src="components/it-requisition.js"></script>
+<script src="components/security-clearance-request.js"></script>
+<script src="components/card-cash-request.js"></script>
+<script src="components/leave-tracking.js"></script>
+<script src="components/e-ticket.js"></script>
+<script src="components/visa-request.js"></script>
+<script src="components/life-insurance.js"></script>
+<script src="components/assign-manager.js"></script>
+<script src="components/induction.js"></script>
+<script src="app.js"></script>
+
+
+</html>
