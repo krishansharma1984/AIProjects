@@ -17,12 +17,7 @@ const routes = [
 ];
 
 const router = new VueRouter({ routes });
-router.beforeEach((to, from, next) => {
-    if (to.path != '/')
-        app.routeClicked = true;
-    console.log('Navigated to:', to.path); // Optional debug
-    next();
-});
+
 
 const app = new Vue({
     el: '#app',
@@ -77,9 +72,13 @@ const app = new Vue({
 
             if (isBottomClicked) {
                 widget.classList.add("chat-position");
+                /* modal.style.width='100%'
+                modal.style.height='100%' */
             }
             else {
                 widget.classList.remove("chat-position");
+                /* modal.style.width='0%'
+                modal.style.height='0%' */
             }
 
         },
@@ -291,8 +290,21 @@ const app = new Vue({
                         })
                     });
                     data = await response.text();
+                    if (this.isJSON(data)) {
+                        const parsedData = JSON.parse(data);
+                        if (parsedData.hasOwnProperty("moduleTitle")) {
+                            this.openModule(parsedData)
+                            this.appendToChat("I have pre-filled form based on extracted information.", "AI");
+                        }
+                        else {
+                            this.appendToChat(data, "AI");
+                        }
+                    }
+                    else {
+                        this.appendToChat(data, "AI");
+                    }
 
-                    this.appendToChat(data, "AI");
+
                 } else {
                     this.appendToChat("No input provided.", "AI");
                 }
@@ -300,7 +312,32 @@ const app = new Vue({
                 this.appendToChat("Error calling API: " + error.message, "AI");
             }
         },
+        openModule(parsedData) {
+            window["prefilledData"] = parsedData
+            if (location.hash != ("#/" + parsedData.moduleTitle))
+                this.navigateTo("/" + parsedData.moduleTitle)
 
+            setTimeout(() => {
+                this.fillForm(parsedData);
+            }, 1000);
+            /* switch (parsedData.moduleTitle) {
+                case "Supplier Contract Parser":
+                case "Contract Requests":
+                    this.navigateTo("/suppliers-creation")
+                    break;
+                default:
+                    this.navigateTo("/")
+
+            } */
+        },
+        isJSON(str) {
+            try {
+                const parsed = JSON.parse(str);
+                return typeof parsed === 'object' && parsed !== null;
+            } catch (e) {
+                return false;
+            }
+        },
         fillForm(data) {
             if (!data) return;
 
@@ -331,4 +368,12 @@ const app = new Vue({
     mounted() {
 
     }
+});
+
+
+router.beforeEach((to, from, next) => {
+    if (to.path != '/')
+        app.routeClicked = true;
+    console.log('Navigated to:', to.path); // Optional debug
+    next();
 });
